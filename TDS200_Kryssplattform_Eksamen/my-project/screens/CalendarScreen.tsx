@@ -38,6 +38,8 @@ const CalendarScreen = ({ navigation }: CalendarScreenProps) => {
         return null;
     };
 
+
+
     return (
         <View style={styles.container}>
             <CalendarList onDayPress={onDayPress} markedDates={{ [selectedDate?.dateString!]: { selected: true } }} />
