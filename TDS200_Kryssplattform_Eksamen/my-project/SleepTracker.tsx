@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 import { Calendar } from 'react-native-calendars';
+import SleepList from './SleepList';
 
 interface SleepData {
     date: string;
@@ -15,21 +16,23 @@ const SleepTracker = () => {
     const [editMode, setEditMode] = useState<boolean>(false);
 
     const handleRegisterSleep = () => {
-        if (sleepData.some(data => data.date === selectedDate)) {
+        if (sleepData.some((data) => data.date === selectedDate)) {
             alert('Sleep data already registered for this date.');
         } else {
-            const newSleepData = {date: selectedDate, hoursSlept: 0, inputText: new Array(10).fill('')};
+            const newSleepData = { date: selectedDate, hoursSlept: 0, inputText: new Array(4).fill('') };
             setSleepData([...sleepData, newSleepData]);
-            setEditMode(true);
+            if (!submitted) {
+                setEditMode(true);
+            }
         }
     };
 
     const handleInputChange = (index: number, text: string) => {
-        const updatedSleepData = sleepData.map(sleep => {
+        const updatedSleepData = sleepData.map((sleep) => {
             if (sleep.date === selectedDate) {
                 const updatedInputText = [...sleep.inputText];
                 updatedInputText[index] = text;
-                return {...sleep, inputText: updatedInputText};
+                return { ...sleep, inputText: updatedInputText };
             }
             return sleep;
         });
@@ -47,10 +50,16 @@ const SleepTracker = () => {
 
     const handleEdit = () => {
         setEditMode(true);
-    }
+    };
 
     const handleDateSelect = (date: any) => {
         setSelectedDate(date.dateString);
+        setEditMode(false);
+    };
+
+    const handleEditSleepData = (date: string) => {
+        setSelectedDate(date);
+        setEditMode(true);
     };
 
     return (
@@ -82,18 +91,23 @@ const SleepTracker = () => {
                             <View>
                                 {sleepData.map((sleep) => {
                                     if (sleep.date === selectedDate) {
-                                        return sleep.inputText.map((text, index) => (
-                                            <TextInput
-                                                key={index.toString()}
-                                                style={{ borderWidth: 1, padding: 10, marginVertical: 10 }}
-                                                placeholder={`Enter text ${index}`}
-                                                value={text}
-                                                onChangeText={(newText: string) =>
-                                                    handleInputChange(index, newText)
-                                                }
-                                                editable={!submitted}
-                                            />
-                                        ));
+                                        return (
+                                            <View key={sleep.date}>
+                                                <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>
+                                                    {sleep.inputText[0]}
+                                                </Text>
+                                                {sleep.inputText.slice(1).map((text, index) => (
+                                                    <TextInput
+                                                        key={index.toString()}
+                                                        style={{ borderWidth: 1, padding: 10, marginVertical: 10, marginHorizontal: 15 }}
+                                                        placeholder={index === 0 ? 'Title' : index === 1 ? 'Time the user went to bed' : index === 2 ? 'Time for when the user woke up' : 'Sleep quality'}
+                                                        value={text}
+                                                        onChangeText={(newText: string) => handleInputChange(index, newText)}
+                                                        editable={!submitted}
+                                                    />
+                                                ))}
+                                            </View>
+                                        );
                                     }
                                     return null;
                                 })}
@@ -107,8 +121,28 @@ const SleepTracker = () => {
                     )}
                 </>
             ) : null}
+            <Text style={{fontWeight: 'bold', marginVertical: 10}}>Sleep Data:</Text>
+            <View>
+                {sleepData.map((data) => (
+                    <View key={data.date}>
+                        <Text style={{fontWeight: 'bold'}}>
+                            {data.date}
+                            <Button title="Edit" onPress={() => setEditMode(true)} />
+                        </Text>
+                        <Text>{`Title: ${data.inputText[0]}`}</Text>
+                        <Text>{`Time the user went to bed: ${data.inputText[1]}`}</Text>
+                        <Text>{`Time for when the user woke up: ${data.inputText[2]}`}</Text>
+                        <Text>{`Sleep quality: ${data.hoursSlept}`}</Text>
+                    </View>
+                ))}
+            </View>
         </View>
     );
 };
+
+
+
+
+
 
 export default SleepTracker;
