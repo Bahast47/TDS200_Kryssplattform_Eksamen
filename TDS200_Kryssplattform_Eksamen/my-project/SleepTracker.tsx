@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import SleepList from './SleepList';
+
 
 interface SleepData {
     date: string;
@@ -19,7 +19,7 @@ const SleepTracker = () => {
         if (sleepData.some((data) => data.date === selectedDate)) {
             alert('Sleep data already registered for this date.');
         } else {
-            const newSleepData = { date: selectedDate, hoursSlept: 0, inputText: new Array(4).fill('') };
+            const newSleepData = { date: selectedDate, hoursSlept: 0, inputText: new Array(5).fill('') };
             setSleepData([...sleepData, newSleepData]);
             if (!submitted) {
                 setEditMode(true);
@@ -93,15 +93,13 @@ const SleepTracker = () => {
                                     if (sleep.date === selectedDate) {
                                         return (
                                             <View key={sleep.date}>
-                                                <Text style={{ fontWeight: 'bold', marginBottom: 10 }}>
-                                                    {sleep.inputText[0]}
-                                                </Text>
+
                                                 {sleep.inputText.slice(1).map((text, index) => (
                                                     <TextInput
                                                         key={index.toString()}
                                                         style={{ borderWidth: 1, padding: 10, marginVertical: 10, marginHorizontal: 15 }}
                                                         placeholder={index === 0 ? 'Title' : index === 1 ? 'Time the user went to bed' : index === 2 ? 'Time for when the user woke up' : 'Sleep quality'}
-                                                        value={text}
+                                                        value={sleep.inputText[index]}
                                                         onChangeText={(newText: string) => handleInputChange(index, newText)}
                                                         editable={!submitted}
                                                     />
