@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SleepData {
     date: string;
@@ -15,24 +15,47 @@ const SleepTracker = () => {
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [editMode, setEditMode] = useState<boolean>(false);
 
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const value = await AsyncStorage.getItem('sleepData');
+                if (value !== null) {
+                    setSleepData(JSON.parse(value));
+                }
+            } catch (e) {
+                console.log('Error reading sleepData from AsyncStorage:', e);
+            }
+        };
+        getData();
+    }, []);
+
+    useEffect(() => {
+        const storeData = async () => {
+            try {
+                await AsyncStorage.setItem('sleepData', JSON.stringify(sleepData));
+            } catch (e) {
+                console.log('Error saving sleepData to AsyncStorage:', e);
+            }
+        };
+        storeData();
+    }, [sleepData]);
+
     const handleRegisterSleep = () => {
-        if (sleepData.some((data) => data.date === selectedDate)) {
+        if (sleepData.some(data => data.date === selectedDate)) {
             alert('Sleep data already registered for this date.');
         } else {
-            const newSleepData = { date: selectedDate, hoursSlept: 0, inputText: new Array(5).fill('') };
+            const newSleepData = {date: selectedDate, hoursSlept: 0, inputText: new Array(5).fill('')};
             setSleepData([...sleepData, newSleepData]);
-            if (!submitted) {
-                setEditMode(true);
-            }
+            setEditMode(true);
         }
     };
 
     const handleInputChange = (index: number, text: string) => {
-        const updatedSleepData = sleepData.map((sleep) => {
+        const updatedSleepData = sleepData.map(sleep => {
             if (sleep.date === selectedDate) {
                 const updatedInputText = [...sleep.inputText];
                 updatedInputText[index] = text;
-                return { ...sleep, inputText: updatedInputText };
+                return {...sleep, inputText: updatedInputText};
             }
             return sleep;
         });
@@ -54,12 +77,6 @@ const SleepTracker = () => {
 
     const handleDateSelect = (date: any) => {
         setSelectedDate(date.dateString);
-        setEditMode(false);
-    };
-
-    const handleEditSleepData = (date: string) => {
-        setSelectedDate(date);
-        setEditMode(true);
     };
 
     return (
@@ -68,10 +85,13 @@ const SleepTracker = () => {
                 onDayPress={handleDateSelect}
                 markedDates={{ [selectedDate]: { selected: true } }}
             />
+
+
             {selectedDate ? (
                 <>
                     <Text>Selected Date: {selectedDate}</Text>
                     {submitted ? (
+
                         <View>
                             <Text>Responses:</Text>
                             {sleepData
@@ -79,9 +99,10 @@ const SleepTracker = () => {
                                 ?.inputText.map((text, index) => (
                                     <Text key={index.toString()}>{text}</Text>
                                 ))}
-                            <Button title="Edit" onPress={() => setSubmitted(false)} />
                         </View>
+
                     ) : (
+
                         <View>
                             <Button
                                 title="Register Sleep"
@@ -125,22 +146,17 @@ const SleepTracker = () => {
                     <View key={data.date}>
                         <Text style={{fontWeight: 'bold'}}>
                             {data.date}
-                            <Button title="Edit" onPress={() => setEditMode(true)} />
+                            <Button title="Edit" onPress={() => setSubmitted(false)} />
                         </Text>
                         <Text>{`Title: ${data.inputText[0]}`}</Text>
                         <Text>{`Time the user went to bed: ${data.inputText[1]}`}</Text>
                         <Text>{`Time for when the user woke up: ${data.inputText[2]}`}</Text>
-                        <Text>{`Sleep quality: ${data.hoursSlept}`}</Text>
+                        <Text>{`Sleep quality: ${data.inputText[3]}`}</Text>
                     </View>
                 ))}
             </View>
         </View>
     );
 };
-
-
-
-
-
 
 export default SleepTracker;

@@ -1,7 +1,10 @@
 import React from 'react';
-import SleepTracker from './SleepTracker'
-export default function App() {
+import SleepTracker from './components/SleepTracker';
+
+const App = () => {
     return (
-     <SleepTracker/>
+        <SleepTracker />
     );
-}
+};
+
+export default App;
