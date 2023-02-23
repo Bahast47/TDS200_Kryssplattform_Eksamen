@@ -1,9 +1,14 @@
 import React from 'react';
-import SleepTracker from './components/SleepTracker';
+import { SafeAreaView, ScrollView } from 'react-native';
+import SleepTracker from './SleepTracker';
 
 const App = () => {
     return (
-        <SleepTracker />
+        <SafeAreaView style={{ flex: 1 }}>
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }} keyboardShouldPersistTaps="handled">
+                <SleepTracker />
+            </ScrollView>
+        </SafeAreaView>
     );
 };
 

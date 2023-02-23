@@ -1,20 +1,23 @@
+// Import necessary modules
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// Define the SleepData interface
 interface SleepData {
     date: string;
-    hoursSlept: number;
     inputText: string[];
 }
 
+// Define the SleepTracker component
 const SleepTracker = () => {
+// Define the state variables using the useState hook
     const [selectedDate, setSelectedDate] = useState<string>('');
     const [sleepData, setSleepData] = useState<SleepData[]>([]);
     const [submitted, setSubmitted] = useState<boolean>(false);
     const [editMode, setEditMode] = useState<boolean>(false);
-
+// Use the useEffect hook to retrieve the sleepData from AsyncStorage on component mount
     useEffect(() => {
         const getData = async () => {
             try {
@@ -29,6 +32,7 @@ const SleepTracker = () => {
         getData();
     }, []);
 
+// Use the useEffect hook to save the sleepData to AsyncStorage on every update
     useEffect(() => {
         const storeData = async () => {
             try {
@@ -40,16 +44,18 @@ const SleepTracker = () => {
         storeData();
     }, [sleepData]);
 
+// Define the handleRegisterSleep function to add a new entry to the sleepData array
     const handleRegisterSleep = () => {
         if (sleepData.some(data => data.date === selectedDate)) {
             alert('Sleep data already registered for this date.');
         } else {
-            const newSleepData = {date: selectedDate, hoursSlept: 0, inputText: new Array(5).fill('')};
+            const newSleepData = {date: selectedDate, hoursSlept: 0, inputText: new Array(6).fill('')};
             setSleepData([...sleepData, newSleepData]);
             setEditMode(true);
         }
     };
 
+// Define the handleInputChange function to update the inputText field of a sleepData entry
     const handleInputChange = (index: number, text: string) => {
         const updatedSleepData = sleepData.map(sleep => {
             if (sleep.date === selectedDate) {
@@ -62,6 +68,7 @@ const SleepTracker = () => {
         setSleepData(updatedSleepData);
     };
 
+// Define the handleSubmit function to submit the sleepData for the selected date
     const handleSubmit = () => {
         if (submitted) {
             alert('You have already submitted your responses for this date.');
@@ -71,26 +78,30 @@ const SleepTracker = () => {
         }
     };
 
+// Define the handleEdit function to enable edit mode for the selected date
     const handleEdit = () => {
         setEditMode(true);
     };
 
+// Define the handleDateSelect function to update the selected date in the state
     const handleDateSelect = (date: any) => {
         setSelectedDate(date.dateString);
     };
 
+// Return the JSX for the SleepTracker component
     return (
         <View>
+            {/* Calendar component to select date */}
             <Calendar
                 onDayPress={handleDateSelect}
                 markedDates={{ [selectedDate]: { selected: true } }}
             />
 
-
+            {/* Display selected date and sleep data input fields */}
             {selectedDate ? (
                 <>
                     <Text>Selected Date: {selectedDate}</Text>
-                    {submitted ? (
+                    {submitted ? ( // If form has been submitted, show response data
 
                         <View>
                             <Text>Responses:</Text>
@@ -101,7 +112,7 @@ const SleepTracker = () => {
                                 ))}
                         </View>
 
-                    ) : (
+                    ) : ( // If form has not been submitted, show input fields
 
                         <View>
                             <Button
@@ -119,7 +130,7 @@ const SleepTracker = () => {
                                                     <TextInput
                                                         key={index.toString()}
                                                         style={{ borderWidth: 1, padding: 10, marginVertical: 10, marginHorizontal: 15 }}
-                                                        placeholder={index === 0 ? 'Title' : index === 1 ? 'Time the user went to bed' : index === 2 ? 'Time for when the user woke up' : 'Sleep quality'}
+                                                        placeholder={index === 0 ? 'Title' : index === 1 ? 'Time, went to bed' : index === 2 ? 'Hours slept' : index === 3 ? 'Comments' : index === 4 ? 'Sleep quality' : ''}
                                                         value={sleep.inputText[index]}
                                                         onChangeText={(newText: string) => handleInputChange(index, newText)}
                                                         editable={!submitted}
@@ -140,6 +151,8 @@ const SleepTracker = () => {
                     )}
                 </>
             ) : null}
+
+            {/* Display all sleep data entries */}
             <Text style={{fontWeight: 'bold', marginVertical: 10}}>Sleep Data:</Text>
             <View>
                 {sleepData.map((data) => (
@@ -149,9 +162,10 @@ const SleepTracker = () => {
                             <Button title="Edit" onPress={() => setSubmitted(false)} />
                         </Text>
                         <Text>{`Title: ${data.inputText[0]}`}</Text>
-                        <Text>{`Time the user went to bed: ${data.inputText[1]}`}</Text>
-                        <Text>{`Time for when the user woke up: ${data.inputText[2]}`}</Text>
-                        <Text>{`Sleep quality: ${data.inputText[3]}`}</Text>
+                        <Text>{`Time, went to bed: ${data.inputText[1]}`}</Text>
+                        <Text>{`Hours slept: ${data.inputText[2]}`}</Text>
+                        <Text>{`Comment: ${data.inputText [3]}`}</Text>
+                        <Text>{`Sleep quality: ${data.inputText[4]}`}</Text>
                     </View>
                 ))}
             </View>
