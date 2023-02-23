@@ -12,12 +12,12 @@ interface SleepData {
 
 // Define the SleepTracker component
 const SleepTracker = () => {
-// Define the state variables using the useState hook
+    // Define the state variables using the useState hook
     const [selectedDate, setSelectedDate] = useState<string>('');
     const [sleepData, setSleepData] = useState<SleepData[]>([]);
     const [submitted, setSubmitted] = useState<boolean>(false);
-    const [editMode, setEditMode] = useState<boolean>(false);
-// Use the useEffect hook to retrieve the sleepData from AsyncStorage on component mount
+
+    // Use the useEffect hook to retrieve the sleepData from AsyncStorage on component mount
     useEffect(() => {
         const getData = async () => {
             try {
@@ -32,7 +32,7 @@ const SleepTracker = () => {
         getData();
     }, []);
 
-// Use the useEffect hook to save the sleepData to AsyncStorage on every update
+    // Use the useEffect hook to save the sleepData to AsyncStorage on every update
     useEffect(() => {
         const storeData = async () => {
             try {
@@ -44,20 +44,19 @@ const SleepTracker = () => {
         storeData();
     }, [sleepData]);
 
-// Define the handleRegisterSleep function to add a new entry to the sleepData array
+    // Define the handleRegisterSleep function to add a new entry to the sleepData array
     const handleRegisterSleep = () => {
-        if (sleepData.some(data => data.date === selectedDate)) {
+        if (sleepData.some((data) => data.date === selectedDate)) {
             alert('Sleep data already registered for this date.');
         } else {
-            const newSleepData = {date: selectedDate, hoursSlept: 0, inputText: new Array(6).fill('')};
+            const newSleepData = {date: selectedDate, inputText: new Array(6).fill('')};
             setSleepData([...sleepData, newSleepData]);
-            setEditMode(true);
         }
     };
 
-// Define the handleInputChange function to update the inputText field of a sleepData entry
+    // Define the handleInputChange function to update the inputText field of a sleepData entry
     const handleInputChange = (index: number, text: string) => {
-        const updatedSleepData = sleepData.map(sleep => {
+        const updatedSleepData = sleepData.map((sleep) => {
             if (sleep.date === selectedDate) {
                 const updatedInputText = [...sleep.inputText];
                 updatedInputText[index] = text;
@@ -68,33 +67,35 @@ const SleepTracker = () => {
         setSleepData(updatedSleepData);
     };
 
-// Define the handleSubmit function to submit the sleepData for the selected date
+    // Define the handleSubmit function to submit the sleepData for the selected date
     const handleSubmit = () => {
         if (submitted) {
             alert('You have already submitted your responses for this date.');
         } else {
             setSubmitted(true);
-            setEditMode(false);
         }
     };
 
-// Define the handleEdit function to enable edit mode for the selected date
-    const handleEdit = () => {
-        setEditMode(true);
-    };
-
-// Define the handleDateSelect function to update the selected date in the state
+    // Define the handleDateSelect function to update the selected date in the state
     const handleDateSelect = (date: any) => {
         setSelectedDate(date.dateString);
+        setSubmitted(false);
+    };
+
+    // Define the handleDeleteSleepData function to delete a sleepData entry
+    const handleDeleteSleepData = (date: string) => {
+        const updatedSleepData = sleepData.filter((data) => data.date !== date);
+        setSleepData(updatedSleepData);
     };
 
 // Return the JSX for the SleepTracker component
+
     return (
         <View>
             {/* Calendar component to select date */}
             <Calendar
                 onDayPress={handleDateSelect}
-                markedDates={{ [selectedDate]: { selected: true } }}
+                markedDates={{[selectedDate]: {selected: true}}}
             />
 
             {/* Display selected date and sleep data input fields */}
@@ -129,7 +130,12 @@ const SleepTracker = () => {
                                                 {sleep.inputText.slice(1).map((text, index) => (
                                                     <TextInput
                                                         key={index.toString()}
-                                                        style={{ borderWidth: 1, padding: 10, marginVertical: 10, marginHorizontal: 15 }}
+                                                        style={{
+                                                            borderWidth: 1,
+                                                            padding: 10,
+                                                            marginVertical: 10,
+                                                            marginHorizontal: 15
+                                                        }}
                                                         placeholder={index === 0 ? 'Title' : index === 1 ? 'Time, went to bed' : index === 2 ? 'Hours slept' : index === 3 ? 'Comments' : index === 4 ? 'Sleep quality' : ''}
                                                         value={sleep.inputText[index]}
                                                         onChangeText={(newText: string) => handleInputChange(index, newText)}
@@ -157,15 +163,9 @@ const SleepTracker = () => {
             <View>
                 {sleepData.map((data) => (
                     <View key={data.date}>
-                        <Text style={{fontWeight: 'bold'}}>
-                            {data.date}
-                            <Button title="Edit" onPress={() => setSubmitted(false)} />
-                        </Text>
-                        <Text>{`Title: ${data.inputText[0]}`}</Text>
-                        <Text>{`Time, went to bed: ${data.inputText[1]}`}</Text>
-                        <Text>{`Hours slept: ${data.inputText[2]}`}</Text>
-                        <Text>{`Comment: ${data.inputText [3]}`}</Text>
-                        <Text>{`Sleep quality: ${data.inputText[4]}`}</Text>
+                        <Text>{data.date}</Text>
+                        <Button title="Edit" onPress={() => alert('Edit button pressed.')}/>
+                        <Button title="Delete" onPress={() => handleDeleteSleepData(data.date)}/>
                     </View>
                 ))}
             </View>
