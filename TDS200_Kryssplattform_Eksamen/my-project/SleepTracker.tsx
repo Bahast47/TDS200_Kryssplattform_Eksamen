@@ -12,12 +12,12 @@ interface SleepData {
 
 // Define the SleepTracker component
 const SleepTracker = () => {
-    // Define the state variables using the useState hook
+// Define the state variables using the useState hook
     const [selectedDate, setSelectedDate] = useState<string>('');
     const [sleepData, setSleepData] = useState<SleepData[]>([]);
     const [submitted, setSubmitted] = useState<boolean>(false);
 
-    // Use the useEffect hook to retrieve the sleepData from AsyncStorage on component mount
+// Use the useEffect hook to retrieve the sleepData from AsyncStorage on component mount
     useEffect(() => {
         const getData = async () => {
             try {
@@ -32,7 +32,7 @@ const SleepTracker = () => {
         getData();
     }, []);
 
-    // Use the useEffect hook to save the sleepData to AsyncStorage on every update
+// Use the useEffect hook to save the sleepData to AsyncStorage on every update
     useEffect(() => {
         const storeData = async () => {
             try {
@@ -44,7 +44,7 @@ const SleepTracker = () => {
         storeData();
     }, [sleepData]);
 
-    // Define the handleRegisterSleep function to add a new entry to the sleepData array
+// Define the handleRegisterSleep function to add a new entry to the sleepData array
     const handleRegisterSleep = () => {
         if (sleepData.some((data) => data.date === selectedDate)) {
             alert('Sleep data already registered for this date.');
@@ -54,7 +54,7 @@ const SleepTracker = () => {
         }
     };
 
-    // Define the handleInputChange function to update the inputText field of a sleepData entry
+// Define the handleInputChange function to update the inputText field of a sleepData entry
     const handleInputChange = (index: number, text: string) => {
         const updatedSleepData = sleepData.map((sleep) => {
             if (sleep.date === selectedDate) {
@@ -67,7 +67,7 @@ const SleepTracker = () => {
         setSleepData(updatedSleepData);
     };
 
-    // Define the handleSubmit function to submit the sleepData for the selected date
+// Define the handleSubmit function to submit the sleepData for the selected date
     const handleSubmit = () => {
         if (submitted) {
             alert('You have already submitted your responses for this date.');
@@ -76,13 +76,13 @@ const SleepTracker = () => {
         }
     };
 
-    // Define the handleDateSelect function to update the selected date in the state
+// Define the handleDateSelect function to update the selected date in the state
     const handleDateSelect = (date: any) => {
         setSelectedDate(date.dateString);
         setSubmitted(false);
     };
 
-    // Define the handleDeleteSleepData function to delete a sleepData entry
+// Define the handleDeleteSleepData function to delete a sleepData entry
     const handleDeleteSleepData = (date: string) => {
         const updatedSleepData = sleepData.filter((data) => data.date !== date);
         setSleepData(updatedSleepData);
@@ -164,7 +164,6 @@ const SleepTracker = () => {
                 {sleepData.map((data) => (
                     <View key={data.date}>
                         <Text>{data.date}</Text>
-                        <Button title="Edit" onPress={() => alert('Edit button pressed.')}/>
                         <Button title="Delete" onPress={() => handleDeleteSleepData(data.date)}/>
                     </View>
                 ))}
